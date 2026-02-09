@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../profile_screen.dart';
 
 class HeaderSection extends StatelessWidget {
   const HeaderSection({super.key});
@@ -70,7 +71,12 @@ class HeaderSection extends StatelessWidget {
                 color: Colors.white,
                 elevation: 10,
                 onSelected: (value) {
-                  // Action based on value
+                  if (value == 'profile') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                    );
+                  }
                 },
                 itemBuilder: (BuildContext context) => [
                   PopupMenuItem<String>(
