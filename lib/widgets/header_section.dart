@@ -2,7 +2,18 @@ import 'package:flutter/material.dart';
 import '../profile_screen.dart';
 
 class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
+  final String? title;
+  final String? subtitle;
+  final bool showBackButton;
+  final bool lightMode; // If true, use white background for buttons (like Profile)
+
+  const HeaderSection({
+    super.key,
+    this.title = 'Coach',
+    this.subtitle = 'Welcome',
+    this.showBackButton = false,
+    this.lightMode = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -11,23 +22,46 @@ class HeaderSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(
-                'Welcome',
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 14,
+              if (showBackButton) ...[
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: lightMode ? Colors.white : Colors.white.withOpacity(0.05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: lightMode ? Colors.black : Colors.white,
+                      size: 20,
+                    ),
+                  ),
                 ),
-              ),
-              const Text(
-                'Coach',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                const SizedBox(width: 15),
+              ],
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: TextStyle(
+                        color: lightMode ? Colors.white.withOpacity(0.8) : Colors.grey[400],
+                        fontSize: 14,
+                      ),
+                    ),
+                  Text(
+                    title!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -38,12 +72,12 @@ class HeaderSection extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: lightMode ? Colors.white : Colors.white.withOpacity(0.05),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.notifications_outlined,
-                      color: Colors.white,
+                      color: lightMode ? Colors.black : Colors.white,
                       size: 24,
                     ),
                   ),
@@ -56,7 +90,10 @@ class HeaderSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.black, width: 2),
+                        border: Border.all(
+                          color: lightMode ? Colors.white : Colors.black,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
@@ -72,10 +109,13 @@ class HeaderSection extends StatelessWidget {
                 elevation: 10,
                 onSelected: (value) {
                   if (value == 'profile') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                    );
+                    // Check if we are already on ProfileScreen to avoid pushing it again
+                    if (title != 'Profile') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                      );
+                    }
                   }
                 },
                 itemBuilder: (BuildContext context) => [

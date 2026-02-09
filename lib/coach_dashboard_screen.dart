@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'create_team_screen.dart';
 import 'widgets/header_section.dart';
 import 'widgets/stats_card.dart';
 import 'widgets/quick_action_card.dart';
@@ -97,7 +98,12 @@ class CoachDashboardScreen extends StatelessWidget {
                       title: 'Create new team',
                       description: 'Add a new group',
                       icon: Icons.add_box_outlined,
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CreateTeamScreen()),
+                        );
+                      },
                     ),
                   ],
                 ),

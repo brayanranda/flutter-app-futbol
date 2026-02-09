@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/bottom_nav_bar.dart';
+import 'widgets/header_section.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -45,70 +46,13 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Top Bar Actions
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
-                          ),
-                        ),
-                        const Text(
-                          'Profile',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.notifications_none, color: Colors.black, size: 24),
-                                ),
-                                Positioned(
-                                  right: 2,
-                                  top: 2,
-                                  child: Container(
-                                    width: 10,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 2),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 10),
-                            const CircleAvatar(
-                              radius: 20,
-                              backgroundImage: NetworkImage(
-                                'https://ui-avatars.com/api/?name=Coach+User&background=random',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                // Top Bar Actions (Reusable Component)
+                const SafeArea(
+                  child: HeaderSection(
+                    title: 'Profile',
+                    subtitle: null,
+                    showBackButton: true,
+                    lightMode: true,
                   ),
                 ),
                 // User Details
