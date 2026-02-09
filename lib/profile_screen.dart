@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'personal_details_screen.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/header_section.dart';
 
@@ -122,7 +123,12 @@ class ProfileScreen extends StatelessWidget {
                     icon: Icons.person_outline,
                     title: 'Account information.',
                     subtitle: 'View personal details.',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PersonalDetailsScreen()),
+                      );
+                    },
                   ),
                   _buildSettingTile(
                     icon: Icons.notifications_none,

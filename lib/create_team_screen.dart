@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'widgets/header_section.dart';
 import 'widgets/bottom_nav_bar.dart';
+import 'widgets/custom_bottom_sheet.dart';
 
 class CreateTeamScreen extends StatefulWidget {
   const CreateTeamScreen({super.key});
@@ -39,21 +40,24 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  children: const [
-                    Icon(Icons.help_outline, color: Colors.blue, size: 24),
-                    SizedBox(width: 10),
-                    Text(
-                      'Instructions as new team',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: () => _showInstructions(context),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.help_outline, color: Colors.blue, size: 24),
+                      SizedBox(width: 10),
+                      Text(
+                        'Instructions as new team',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -159,6 +163,52 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
         ),
       ),
       bottomNavigationBar: const CustomBottomNavBar(),
+    );
+  }
+
+  void _showInstructions(BuildContext context) {
+    CustomBottomSheet.show(
+      context: context,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'As the team creator, you\'ll automatically be assigned as the coach. You\'ll be able to:',
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              height: 1.4,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildBulletPoint('Create and manage events'),
+          _buildBulletPoint('Track team attendance'),
+          _buildBulletPoint('Communicate with all team members'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(fontSize: 22, color: Colors.black87)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 18,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

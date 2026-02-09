@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'custom_bottom_sheet.dart';
+import 'role_selection_content.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
   const CustomBottomNavBar({super.key});
@@ -11,9 +13,19 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 4) {
+      // Last icon (Shield) opens the Role Selection Modal
+      CustomBottomSheet.show(
+        context: context,
+        showFloatingIcon: true,
+        floatingIcon: Icons.shield,
+        content: const RoleSelectionContent(),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
