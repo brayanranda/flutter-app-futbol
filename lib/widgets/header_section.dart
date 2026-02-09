@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../profile_screen.dart';
+import '../login_screen.dart';
 
 class HeaderSection extends StatelessWidget {
   final String? title;
@@ -116,6 +117,12 @@ class HeaderSection extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => const ProfileScreen()),
                       );
                     }
+                  } else if (value == 'logout') {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      (route) => false,
+                    );
                   }
                 },
                 itemBuilder: (BuildContext context) => [
