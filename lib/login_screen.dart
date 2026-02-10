@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'coach_dashboard_screen.dart';
+import 'services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Endpoint: localhost:8080/auth/login
       // Note: On Android emulator use 10.0.2.2 instead of localhost
       final response = await http.post(
-        Uri.parse('http://192.168.1.6:8080/auth/login'),
+        Uri.parse('http://192.168.1.9:8080/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _emailController.text.trim(),
@@ -36,6 +37,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         // Success
+        final data = jsonDecode(response.body);
+        final String? token = data['token'] ?? data['accessToken'] ?? data['jwt'];
+        
+        if (token != null) {
+          AuthService().saveToken(token);
+        }
+
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -250,14 +258,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLogo() {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-             Icon(Icons.sports_soccer, color: Colors.white, size: 40),
-             Icon(Icons.sports_basketball, color: Colors.white, size: 40),
-             Icon(Icons.sports_tennis, color: Colors.white, size: 40),
-          ],
-        ),
         const SizedBox(height: 8),
         const Text(
           'LEAGUE CENTRAL',

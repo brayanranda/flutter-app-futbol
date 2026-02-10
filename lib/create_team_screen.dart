@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'widgets/header_section.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/custom_bottom_sheet.dart';
+import 'coach_dashboard_screen.dart';
+import 'services/auth_service.dart';
 
 class CreateTeamScreen extends StatefulWidget {
   const CreateTeamScreen({super.key});
@@ -12,8 +16,76 @@ class CreateTeamScreen extends StatefulWidget {
 
 class _CreateTeamScreenState extends State<CreateTeamScreen> {
   bool isCustomCode = false;
+  bool _isLoading = false;
   final TextEditingController _teamNameController = TextEditingController();
   final TextEditingController _inviteCodeController = TextEditingController();
+  
+  String? _selectedSport = 'Soccer';
+  String? _selectedSportType;
+
+  final List<String> _sportTypeOptions = [
+    'FOOTBALL_11_A_SIDE',
+    'FUTSAL',
+    'FOOTBALL_7_A_SIDE',
+    'FOOTBALL_5_A_SIDE',
+    'BEACH_SOCCER',
+    'INDOOR_SOCCER',
+    'STREET_FOOTBALL',
+  ];
+
+  Future<void> _saveTeam() async {
+    if (_teamNameController.text.isEmpty) {
+      _showError('Please enter a team name');
+      return;
+    }
+    if (_selectedSportType == null) {
+      _showError('Please select a sport type');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.1.9:8080/teams'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${AuthService().token}',
+        },
+        body: jsonEncode({
+          'name': _teamNameController.text.trim(),
+          'sport': _selectedSport,
+          'sportType': _selectedSportType,
+          'inviteCode': isCustomCode ? _inviteCodeController.text.trim() : 'AUTO_GEN', // Placeholder if not custom
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Team created successfully!'), backgroundColor: Colors.green),
+          );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const CoachDashboardScreen()),
+            (route) => false,
+          );
+        }
+      } else {
+        _showError('Failed to create team: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showError('Error connecting to server: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,21 +143,25 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                     _buildLabel('Team name'),
                     _buildTextField(
                       controller: _teamNameController,
-                      hint: 'Lorem ipsum',
+                      hint: 'My Awesome Team',
                     ),
                     const SizedBox(height: 20),
                     
                     _buildLabel('Sport (optional)'),
                     _buildDropdown(
                       hint: 'Select a sport...',
+                      value: _selectedSport,
                       items: ['Soccer', 'Basketball', 'Tennis'],
+                      onChanged: (val) => setState(() => _selectedSport = val),
                     ),
                     const SizedBox(height: 20),
                     
                     _buildLabel('Sport Type'),
                     _buildDropdown(
                       hint: 'Select a soccer type...',
-                      items: ['11-a-side', '7-a-side', 'Futsal'],
+                      value: _selectedSportType,
+                      items: _sportTypeOptions,
+                      onChanged: (val) => setState(() => _selectedSportType = val),
                     ),
                     const SizedBox(height: 20),
                     
@@ -137,21 +213,23 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                       width: double.infinity,
                       height: 55,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _isLoading ? null : _saveTeam,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange[800],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading 
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -249,7 +327,12 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
     );
   }
 
-  Widget _buildDropdown({required String hint, required List<String> items}) {
+  Widget _buildDropdown({
+    required String hint, 
+    required List<String> items, 
+    String? value,
+    required void Function(String?) onChanged,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
@@ -258,17 +341,18 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButtonFormField<String>(
+          value: value,
           decoration: const InputDecoration(border: InputBorder.none),
           hint: Text(hint, style: const TextStyle(color: Colors.grey)),
           icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
           dropdownColor: Colors.white,
-          items: items.map((String value) {
+          items: items.map((String val) {
             return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value, style: const TextStyle(color: Colors.black87)),
+              value: val,
+              child: Text(val, style: const TextStyle(color: Colors.black87)),
             );
           }).toList(),
-          onChanged: (_) {},
+          onChanged: onChanged,
         ),
       ),
     );
